@@ -1,6 +1,7 @@
 {
   "name": "blipng",
   "version": "0.0.1",
+  "description": "Lightweight library for Angular Signals",
   "peerDependencies": {
     "@angular/common": "^19.2.0",
     "@angular/core": "^19.2.0"
