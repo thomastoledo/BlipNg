@@ -1,6 +1,6 @@
 {
   "name": "blipng",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Lightweight library for Angular Signals",
   "peerDependencies": {
     "@angular/common": "^19.2.0",
@@ -15,5 +15,14 @@
     "name": "Thomas TOLEDO",
     "email": "ttld.eurl@gmail.com",
     "url": "http://www.github.com/thomastoledo"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thomastoledo/BlipNg.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thomastoledo/BlipNg/issues"
+  },
+  "homepage": "https://github.com/thomastoledo/BlipNg#readme"
 }

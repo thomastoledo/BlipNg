@@ -40,5 +40,13 @@
     "name": "Thomas TOLEDO",
     "email": "ttld.eurl@gmail.com",
     "url": "http://www.github.com/thomastoledo"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thomastoledo/BlipNg.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thomastoledo/BlipNg/issues"
+  },
+  "homepage": "https://github.com/thomastoledo/BlipNg#readme"
 }

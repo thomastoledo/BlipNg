@@ -1,13 +1,12 @@
-import { runInInjectionContext, destroyPlatform } from '@angular/core';
-import { BlipNgStore, provideBlipStore } from './blipng.store';
 import { TestBed } from '@angular/core/testing';
+import { BlipNgStore, provideBlipStore } from './blipng.store';
 
 interface TestState {
   count: number;
   user: string | null;
 }
 
-describe('BlipStore', () => {
+describe('BlipStore (with Blip)', () => {
   let store: BlipNgStore<TestState>;
 
   beforeEach(() => {
@@ -17,34 +16,37 @@ describe('BlipStore', () => {
     store = TestBed.inject(BlipNgStore<TestState>);
   });
 
-  afterEach(() => {
-    destroyPlatform();
+  it('should expose the current state as a Blip', () => {
+    expect(store.state.get()).toEqual({ count: 1, user: 'alice' });
   });
 
-  it('should expose the current state as a signal', () => {
-    expect(store.state()).toEqual({ count: 1, user: 'alice' });
+  it('should allow selecting a key as a Blip', () => {
+    const countBlip = store.select('count');
+    expect(countBlip.get()).toBe(1);
   });
 
-  it('should allow selecting a specific key', () => {
-    const countSignal = store.select('count');
-    expect(countSignal()).toBe(1);
-  });
-
-  it('should update the state via setState', () => {
+  it('should update the state with setState()', () => {
     store.setState({ count: 5 });
-    expect(store.state().count).toBe(5);
-    expect(store.state().user).toBe('alice');
+    expect(store.state.get().count).toBe(5);
+    expect(store.state.get().user).toBe('alice');
   });
 
-  it('should update a specific key via update()', () => {
+  it('should update a single key with update()', () => {
     store.update('count', c => c + 10);
-    expect(store.state().count).toBe(11);
+    expect(store.state.get().count).toBe(11);
   });
 
-  it('select() should reflect updated values', () => {
-    const userSignal = store.select('user');
-    expect(userSignal()).toBe('alice');
+  it('selected Blips should reflect updated values', () => {
+    const userBlip = store.select('user');
+    expect(userBlip.get()).toBe('alice');
     store.setState({ user: 'bob' });
-    expect(userSignal()).toBe('bob');
+    expect(userBlip.get()).toBe('bob');
+  });
+
+  it('should allow chaining operators on select()', () => {
+    const doubled = store.select('count').map(c => c * 2);
+    expect(doubled.get()).toBe(2);
+    store.update('count', c => c + 2);
+    expect(doubled.get()).toBe(6);
   });
 });
