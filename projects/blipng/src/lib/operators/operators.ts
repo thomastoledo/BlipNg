@@ -15,15 +15,19 @@ export function filter<T>(source: Signal<T>, predicate: (value: T) => boolean): 
 
 export function debounce<T>(source: Signal<T>, delayMs: number): Signal<T> {
     const result = signal(source());
-    let timeout: any;
-
+    let timeout: number;
+  
     effect(() => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => result.set(source()), delayMs);
+      clearTimeout(timeout);
+      const current = source();
+      timeout = window.setTimeout(() => {
+        queueMicrotask(() => result.set(current));
+      }, delayMs);
     });
-
+  
     return result;
-}
+  }
+  
 
 export function distinctUntilChanged<T>(source: Signal<T>): Signal<T> {
     let previous: T;
@@ -57,7 +61,7 @@ export function merge<T>(...sources: Signal<T>[]): Signal<T> {
 
     return computed(() => {
         const fifo = [...queue()];
-        return fifo[fifo.length - 1];
+        return fifo.length > 0 ? fifo[fifo.length - 1] : untracked(sources[0]);
     });
 }
 

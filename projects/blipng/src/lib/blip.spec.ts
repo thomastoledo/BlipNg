@@ -1,7 +1,6 @@
 import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
-import { effect, EnvironmentInjector, runInInjectionContext, Signal, signal, WritableSignal } from '@angular/core';
+import { effect, EnvironmentInjector, runInInjectionContext, signal } from '@angular/core';
 import { Blip, blip } from './blip';
-import { merge } from 'blipng';
 
 describe('Blip (with Angular injection context)', () => {
   let injector: EnvironmentInjector;
