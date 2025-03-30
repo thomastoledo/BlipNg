@@ -1,59 +1,257 @@
-# BlipWorkspace
+# BlipNg
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.5.
+**BlipNg** is a lightweight library of functional operators for Angular Signals.  
+It brings expressive and composable utilities inspired by RxJS—but optimized for the reactive signal-based paradigm in Angular 17+.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🚀 Features
 
-```bash
-ng serve
-```
+- Functional signal operators (`map`, `filter`, `debounce`, `merge`, etc.)
+- Composable and testable
+- Zero dependencies
+- Compatible with Angular's `Signal<T>` and `WritableSignal<T>`
+- Built for Angular 17+
+- A lightweight store based solely on signals
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 📦 Installation
 
 ```bash
-ng generate --help
+npm install blipng
 ```
 
-## Building
+---
 
-To build the project run:
+## 🧠 Usage
 
-```bash
-ng build
+```ts
+import { signal } from '@angular/core';
+import { map, debounce, merge, switchMap } from 'blipng';
+
+const count = signal(0);
+const doubled = map(count, n => n * 2);
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## 🧱 BlipStore: lightweight reactive state management
 
-## Running unit tests
+BlipNg includes an optional injectable service, `BlipStore<T>`, for managing application or feature state using Angular Signals.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+It provides a minimal, type-safe, and fully reactive alternative to NgRx or ComponentStore.
 
-```bash
-ng test
+---
+
+### 🛠️ Setup
+
+Register it in your `app.config.ts` or `bootstrapApplication()`:
+
+```ts
+import { provideBlipStore } from 'blipng';
+
+provideBlipStore<{ count: number; user: string | null }>({
+  count: 0,
+  user: null
+})
 ```
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+### 📦 Usage in a component or service
 
-```bash
-ng e2e
+```ts
+import { BlipStore } from 'blipng';
+
+@Component({...})
+export class MyComponent {
+  readonly count = this.store.select('count');
+  readonly user = this.store.select('user');
+
+  constructor(private store: BlipStore<{ count: number; user: string | null }>) {}
+
+  increment() {
+    this.store.update('count', c => c + 1);
+  }
+
+  login(name: string) {
+    this.store.setState({ user: name });
+  }
+}
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
+### 🧠 API
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+#### `select<K extends keyof T>(key: K): Signal<T[K]>`
+Returns a signal for a specific property in the state.
+
+#### `setState(partial: Partial<T>): void`
+Partially replaces the state with new values.
+
+#### `update<K extends keyof T>(key: K, updater: (value: T[K]) => T[K]): void`
+Applies a transformation function to a specific key.
+
+#### `state: Signal<T>`
+Provides read-only access to the full state object.
+
+---
+
+### ✅ Example
+
+```ts
+const store = inject(BlipStore<{ count: number }>);
+
+store.select('count')(); // 0
+
+store.update('count', c => c + 1);
+store.setState({ count: 42 });
+```
+
+---
+
+### 🔍 Why BlipStore?
+
+- 🔸 Type-safe and reactive
+- 🔸 No actions, reducers or selectors
+- 🔸 Encourages clean component-driven state
+- 🔸 Built directly on Angular Signals
+- 🔸 Easy to test and compose
+
+---
+
+### 🧪 Testing
+
+BlipStore is fully testable using `TestBed`:
+
+```ts
+TestBed.configureTestingModule({
+  providers: provideBlipStore({ count: 0, user: 'test' })
+});
+const store = TestBed.inject(BlipStore);
+```
+
+---
+
+## 💡 Tip
+
+You can create multiple stores (e.g., `AuthStore`, `TodoStore`) by extending `BlipStore<T>` or by registering with different types using `provideBlipStore()`.
+
+---
+
+
+## 📚 Available Operators
+
+### `map(source, transform)`
+
+Transforms the value of a signal.
+
+```ts
+map(count, n => n * 2); // → Signal<number>
+```
+
+---
+
+### `filter(source, predicate)`
+
+Filters values based on a condition. Returns `undefined` if the condition fails.
+
+```ts
+filter(count, n => n % 2 === 0); // → Signal<number | undefined>
+```
+
+---
+
+### `debounce(source, delayMs)`
+
+Emits the signal value only after a specified delay.
+
+```ts
+debounce(searchInput, 300); // → Signal<string>
+```
+
+---
+
+### `distinctUntilChanged(source)`
+
+Only emits when the value actually changes.
+
+```ts
+distinctUntilChanged(userId); // → Signal<string>
+```
+
+---
+
+### `combine(...sources)`
+
+Combines multiple signals into a single signal containing a tuple of their values.
+
+```ts
+combine(a, b, c); // → Signal<[A, B, C]>
+```
+
+---
+
+### `merge(...sources)`
+
+Merges multiple signals and emits the **last value received**, respecting the **actual order of emission**, even within the same Angular change detection cycle.
+
+```ts
+merge(a, b, c); // → Signal<T>
+```
+
+---
+
+### `sample(source, trigger)`
+
+Emits the current value of `source` **only** when `trigger` changes.
+
+```ts
+sample(formValue, submitClick);
+```
+
+---
+
+### `switchMap(source, transform)`
+
+Dynamically switches to a new signal when `source` changes.
+
+```ts
+switchMap(userId, id => fetchUserSignal(id));
+```
+
+---
+
+## 🧪 Testing
+
+BlipNg is tested with:
+
+- Angular 17+
+- `@angular/core/testing` utilities (`runInInjectionContext`, `fakeAsync`, `tick`)
+- No DOM dependencies
+- No Zone.js or Karma required
+
+---
+
+## 🔧 Example
+
+```ts
+const count = signal(0);
+const even = filter(count, n => n % 2 === 0);
+const delayed = debounce(count, 500);
+const combined = combine(count, even);
+const dynamic = switchMap(count, value => signal(`Count: ${value}`));
+```
+
+---
+
+## 🧩 Why "BlipNg"?
+
+Because it's small, reactive, and fits Angular's signal ecosystem perfectly.  
+Also, it's fun to say.
+
+---
+
+## 📃 License
+
+MIT

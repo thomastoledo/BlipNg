@@ -1,0 +1,17 @@
+{
+  "name": "blipng",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^19.2.0",
+    "@angular/core": "^19.2.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "author": {
+    "name": "Thomas TOLEDO",
+    "email": "ttld.eurl@gmail.com",
+    "url": "http://www.github.com/thomastoledo"
+  }
+}
