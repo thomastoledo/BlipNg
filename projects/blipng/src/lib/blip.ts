@@ -11,7 +11,7 @@ import {
 } from './operators/operators';
 
 export class Blip<T> {
-  constructor(private _signal: WritableSignal<T> | Signal<T>) {}
+  constructor(private _signal: WritableSignal<T> | Signal<T>) { }
 
   static fromSignal<U>(sig: Signal<U>): Blip<U> {
     return new Blip(sig);
@@ -21,6 +21,12 @@ export class Blip<T> {
     return new Blip<U>(combine<U>(...sources));
   }
 
+  /**
+ * @deprecated this operator goes against Signals philosophy and will be removed in the next versions
+ * Please stick to Observables or use mergeMap with interop Signal for this one
+ * @param sources
+ * @returns 
+ */
   static merge<U>(...sources: Signal<U>[]): Blip<U> {
     return new Blip<U>(merge<U>(...sources));
   }
@@ -33,6 +39,11 @@ export class Blip<T> {
     return new Blip(filter(this._signal, predicate));
   }
 
+  /**
+   * @deprecated this operator goes against Signals philosophy and will be removed in the next versions
+   * @param ms 
+   * @returns debounced signal
+   */
   debounce(ms: number): Blip<T> {
     return new Blip(debounce(this._signal, ms));
   }
@@ -41,6 +52,13 @@ export class Blip<T> {
     return new Blip(distinctUntilChanged(this._signal));
   }
 
+ /**
+ * @deprecated this operator goes against Signals philosophy and will be removed in the next versions
+ * Please use toSignal(toObservable(...).pipe(sample(...))) or stick to observables for this one
+ * @param source 
+ * @param trigger 
+ * @returns a Signal
+ */
   sample(trigger: Signal<any>): Blip<T> {
     return new Blip(sample(this._signal, trigger));
   }

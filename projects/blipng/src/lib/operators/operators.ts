@@ -1,5 +1,4 @@
 import { Signal, computed, signal, untracked, effect } from '@angular/core';
-import { tick } from '@angular/core/testing';
 
 export function map<T, R>(source: Signal<T>, transform: (value: T) => R): Signal<R> {
     return computed(() => transform(source()));
@@ -13,6 +12,13 @@ export function filter<T>(source: Signal<T>, predicate: (value: T) => boolean): 
     });
 }
 
+/**
+ * @deprecated this operator goes against Signals philosophy and will be removed in the next versions
+ * Please stick to Observables for this one
+ * @param source 
+ * @param delayMs 
+ * @returns a debounced Signal
+ */
 export function debounce<T>(source: Signal<T>, delayMs: number): Signal<T> {
     const result = signal(source());
     let timeout: number;
@@ -45,6 +51,12 @@ export function combine<T extends unknown[]>(...sources: { [K in keyof T]: Signa
     return computed(() => sources.map(s => s()) as T);
 }
 
+/**
+ * @deprecated this operator goes against Signals philosophy and will be removed in the next versions
+ * Please stick to Observables or use mergeMap with interop Signal for this one
+ * @param sources
+ * @returns 
+ */
 export function merge<T>(...sources: Signal<T>[]): Signal<T> {
 
     if (sources.length === 0) {
@@ -65,8 +77,15 @@ export function merge<T>(...sources: Signal<T>[]): Signal<T> {
     });
 }
 
-
+/**
+ * @deprecated this operator goes against Signals philosophy and will be removed in the next versions
+ * Please use toSignal(toObservable(...).pipe(sample(...))) or stick to observables for this one
+ * @param source 
+ * @param trigger 
+ * @returns a Signal
+ */
 export function sample<T>(source: Signal<T>, trigger: Signal<any>): Signal<T> {
+
     const result = signal(source());
 
     effect(() => {
